@@ -16,7 +16,7 @@ function checksExistsUserAccount(request, response, next) {
   const userExists = users.some((user) => user.username == username);
 
   if (!userExists) {
-    return response.status(400).json({ error: 'Mensagem do erro' })
+    return response.status(400).json({ error: 'Usuário nao existe.' })
   }
 
   const user = users.find(user => user.username == username)
@@ -24,9 +24,7 @@ function checksExistsUserAccount(request, response, next) {
   return next();
 }
 
-
 app.get('/users', (request, response) => {
-
   return response.json(users)
 })
 
@@ -93,6 +91,19 @@ app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
 
 app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
   // Complete aqui
+  const { id } = request.params
+  const { user } = request
+
+  const todoExists = user.todos.some((todo) => todo.id == id);
+
+  if (!todoExists) {
+    return response.status(404).json({ error: 'Todo não existe.' })
+  }
+
+  const todo = user.todos.find((todo) => todo.id == id)
+  todo.done = true
+
+  return response.json(todo)
 });
 
 app.delete('/todos/:id', checksExistsUserAccount, (request, response) => {
